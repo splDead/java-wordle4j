@@ -19,7 +19,7 @@ public class WordleDictionaryLoader {
     public WordleDictionary load(String fileName) throws EmptyDictionaryException {
         List<String> dictionary = new ArrayList<>();
 
-        try(BufferedReader br = new BufferedReader(new FileReader(fileName, StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName, StandardCharsets.UTF_8))) {
             while (br.ready()) {
                 dictionary.add(br.readLine());
             }
