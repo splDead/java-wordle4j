@@ -25,16 +25,18 @@ public class WordleGame {
     private boolean isGuessed;
     private List<String> possibleAnswers;
     private List<String> wordsUsed;
-    private boolean[] guessedLetters;
+    private boolean[] guessedLettersPosition;
+    private int maxHintCount;
 
     public WordleGame(WordleDictionary dictionary) {
         this.dictionary = dictionary;
         steps = 6;
         answer = dictionary.getRandomWord();
         isGuessed = false;
-        possibleAnswers = dictionary.getHints(answer);
+        possibleAnswers = new ArrayList<>(dictionary.getWords());
         wordsUsed = new ArrayList<>();
-        guessedLetters = new boolean[WordleDictionary.WORD_LENGTH];
+        guessedLettersPosition = new boolean[WordleDictionary.WORD_LENGTH];
+        maxHintCount = 3;
     }
 
     // добавляет слово в список использованных с учетом уникальности
@@ -66,8 +68,8 @@ public class WordleGame {
                 possibleAnswers.remove(word);
             }
 
-            // анализируем сколько букв угадал
-            guessedLetters = WordleDictionary.analyzeGuessedLetters(word, answer);
+            // анализируем на какой позиции буква угадана
+            WordleDictionary.analyzeGuessedLettersPosition(word, answer, guessedLettersPosition);
 
             // уменьшаем оставшиеся попытки
             steps--;
@@ -96,36 +98,67 @@ public class WordleGame {
             index = random.nextInt(wordsUsed.size());
             possibleAnswer = wordsUsed.get(index);
             Wordle.gameLogger.log("Предложенный ответ взят из списка ранее использованных слов: " + possibleAnswer);
-            return possibleAnswer;
-        }
 
-        // проверяем угадал ли игрок хотя бы одну букву
-        if (hasTrue()) {
-            List<String> filteredPossibleAnswers = new ArrayList<>();
-            for (String str : possibleAnswers) {
-                if (WordleDictionary.matchesMask(str, answer, guessedLetters)) {
-                    filteredPossibleAnswers.add(str);
-                }
-            }
-            index = random.nextInt(filteredPossibleAnswers.size());
-            possibleAnswer = filteredPossibleAnswers.remove(index); // извлекаем возможный ответ из фильтрованного списка возможных
-            possibleAnswers.remove(possibleAnswer); // и убираем из возможных ответов
-            Wordle.gameLogger.log("Предложенный ответ взят из списка возможных ответов с учетом угаданных букв: " + possibleAnswer);
+            // открываем следующую букву
+            openNextLetterPosition();
+
+            return possibleAnswer;
         } else {
+            // проверяем угадал ли игрок хотя бы одну букву
+            if (WordleDictionary.hasTrue(guessedLettersPosition)) {
+                List<String> filteredPossibleAnswers = new ArrayList<>();
+
+                // фильтруем слова по угаданным позициям
+                for (String str : possibleAnswers) {
+                    if (WordleDictionary.matchesMask(str, answer, guessedLettersPosition)) {
+                        filteredPossibleAnswers.add(str);
+                    }
+                }
+
+                possibleAnswers = filteredPossibleAnswers; // обновляем список возможных ответов
+            }
+
+            // открываем букву для следующей подсказки
+            openNextLetterPosition();
+
             index = random.nextInt(possibleAnswers.size());
             possibleAnswer = possibleAnswers.remove(index); // извлекаем возможный ответ из всего списка возможных
             Wordle.gameLogger.log("Предложенный ответ взят из списка возможных ответов: " + possibleAnswer);
-        }
 
-        addWordUsed(possibleAnswer); // сохраняем его
-        return possibleAnswer;
+            addWordUsed(possibleAnswer); // сохраняем его
+            return possibleAnswer;
+        }
     }
 
-    // проверяет угадана ли хотя бы одна буква
-    private boolean hasTrue() {
-        for (boolean b : guessedLetters) {
-            if (b) return true;
+    // задаем случайной позиции значение true, что означает открытую букву
+    private void openNextLetterPosition() {
+        // закончились подсказки или все буквы открыты или открыто три и более буквы ничего не делаем
+        if (maxHintCount == 0 || WordleDictionary.isAllTrue(guessedLettersPosition) || WordleDictionary.countTrue(guessedLettersPosition) >= 3) {
+            return;
         }
-        return false;
+
+        Wordle.gameLogger.log("Используем подсказку, открываем случайную букву");
+        maxHintCount--;
+        Random random = new Random();
+        while (true) {
+            int index = random.nextInt(guessedLettersPosition.length);
+            if (!guessedLettersPosition[index]) {
+                guessedLettersPosition[index] = true;
+                break;
+            }
+        }
+    }
+
+    // геттеры только для теста
+    public String getAnswer() {
+        return answer;
+    }
+
+    public WordleDictionary getDictionary() {
+        return dictionary;
+    }
+
+    public int getMaxHintCount() {
+        return maxHintCount;
     }
 }

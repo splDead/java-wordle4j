@@ -19,6 +19,31 @@ public class WordleDictionary {
         this.words = prepareDictionary(words);
     }
 
+    // проверяет угадана ли хотя бы одна буква
+    static boolean hasTrue(boolean[] array) {
+        for (boolean b : array) {
+            if (b) return true;
+        }
+        return false;
+    }
+
+    // проверяем все ли буквы угаданы
+    public static boolean isAllTrue(boolean[] array) {
+        for (boolean b : array) {
+            if (!b) return false;
+        }
+        return true;
+    }
+
+    // считаем сколько угадано букв
+    public static int countTrue(boolean[] array) {
+        int count = 0;
+        for (boolean b : array) {
+            if (b) count++;
+        }
+        return count;
+    }
+
     /**
      * Подготовка загруженного списка:
      * <ul>
@@ -35,6 +60,10 @@ public class WordleDictionary {
             }
         }
         return res;
+    }
+
+    public List<String> getWords() {
+        return words;
     }
 
     /**
@@ -149,14 +178,12 @@ public class WordleDictionary {
      * @param answer ответ
      * @return маску, в которой описано буквы на какой позиции были угаданы
      */
-    public static boolean[] analyzeGuessedLetters(String word, String answer) {
-        boolean[] res = new boolean[WORD_LENGTH];
-
+    public static void analyzeGuessedLettersPosition(String word, String answer, boolean[] guessedLettersPosition) {
         for (int i = 0; i < answer.length(); i++) {
-            res[i] = word.charAt(i) == answer.charAt(i);
+            if (!guessedLettersPosition[i]) {
+                guessedLettersPosition[i] = word.charAt(i) == answer.charAt(i);
+            }
         }
-
-        return res;
     }
 
     /**
