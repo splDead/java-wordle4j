@@ -95,14 +95,10 @@ public class WordleGame {
 
         // если список возможных ответов пуст отдаем случайный использованный
         if (possibleAnswers.isEmpty()) {
-            index = random.nextInt(wordsUsed.size());
-            possibleAnswer = wordsUsed.get(index);
-            Wordle.gameLogger.log("Предложенный ответ взят из списка ранее использованных слов: " + possibleAnswer);
-
             // открываем следующую букву
             openNextLetterPosition();
 
-            return possibleAnswer;
+            return getRandomFromWordsUsed();
         } else {
             // проверяем угадал ли игрок хотя бы одну букву
             if (WordleDictionary.hasTrue(guessedLettersPosition)) {
@@ -121,6 +117,11 @@ public class WordleGame {
             // открываем букву для следующей подсказки
             openNextLetterPosition();
 
+            // повторная проверка после фильтрации по маске
+            if (possibleAnswers.isEmpty()) {
+                return getRandomFromWordsUsed();
+            }
+
             index = random.nextInt(possibleAnswers.size());
             possibleAnswer = possibleAnswers.remove(index); // извлекаем возможный ответ из всего списка возможных
             Wordle.gameLogger.log("Предложенный ответ взят из списка возможных ответов: " + possibleAnswer);
@@ -128,6 +129,14 @@ public class WordleGame {
             addWordUsed(possibleAnswer); // сохраняем его
             return possibleAnswer;
         }
+    }
+
+    private String getRandomFromWordsUsed() {
+        Random random = new Random();
+        int index = random.nextInt(wordsUsed.size());
+        String possibleAnswer = wordsUsed.get(index);
+        Wordle.gameLogger.log("Предложенный ответ взят из списка ранее использованных слов: " + possibleAnswer);
+        return possibleAnswer;
     }
 
     // задаем случайной позиции значение true, что означает открытую букву
