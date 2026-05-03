@@ -19,6 +19,9 @@ import java.util.*;
 не забудьте про специальные типы исключений для игровых и неигровых ошибок
  */
 public class WordleGame {
+    private final int MAX_GAME_STEPS = 6;
+    private final int MAX_HINT_COUNT = 3;
+
     private String answer;
     private int steps;
     private WordleDictionary dictionary;
@@ -30,13 +33,13 @@ public class WordleGame {
 
     public WordleGame(WordleDictionary dictionary) {
         this.dictionary = dictionary;
-        steps = 6;
+        steps = MAX_GAME_STEPS;
         answer = dictionary.getRandomWord();
         isGuessed = false;
         possibleAnswers = new ArrayList<>(dictionary.getWords());
         wordsUsed = new ArrayList<>();
         guessedLettersPosition = new boolean[WordleDictionary.WORD_LENGTH];
-        maxHintCount = 3;
+        maxHintCount = MAX_HINT_COUNT;
     }
 
     // добавляет слово в список использованных с учетом уникальности
