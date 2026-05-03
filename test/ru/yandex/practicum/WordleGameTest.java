@@ -15,7 +15,7 @@ class WordleGameTest {
     private WordleDictionary dictionary;
     private WordleGame game;
     private final List<String> list = List.of("арбуз", "багет", "ветка", "экран", "поиск", "герой", "гонец");
-    private final int MAX_HINTS = 5;
+    private final int maxHints = 5;
 
     @BeforeEach
     void setUp() {
@@ -51,12 +51,12 @@ class WordleGameTest {
     @DisplayName("Максимальное количество подсказок, открывающих буквы, ограничено")
     void shouldRespectMaxHintCount() {
         // Вызываем подсказку много раз
-        for (int i = 0; i < MAX_HINTS; i++) {
+        for (int i = 0; i < maxHints; i++) {
             game.getHint();
         }
 
 
         // Проверяем, что осталось ноль подсказок
-        assertTrue(game.getMaxHintCount() == 0);
+        assertTrue(game.getHintCount() == 0);
     }
 }

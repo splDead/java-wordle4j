@@ -19,8 +19,8 @@ import java.util.*;
 не забудьте про специальные типы исключений для игровых и неигровых ошибок
  */
 public class WordleGame {
-    private final int MAX_GAME_STEPS = 6;
-    private final int MAX_HINT_COUNT = 3;
+    private final int maxGameSteps = 6;
+    private final int maxHintCount = 3;
 
     private String answer;
     private int steps;
@@ -29,17 +29,17 @@ public class WordleGame {
     private List<String> possibleAnswers;
     private List<String> wordsUsed;
     private boolean[] guessedLettersPosition;
-    private int maxHintCount;
+    private int hintCount;
 
     public WordleGame(WordleDictionary dictionary) {
         this.dictionary = dictionary;
-        steps = MAX_GAME_STEPS;
+        steps = maxGameSteps;
         answer = dictionary.getRandomWord();
         isGuessed = false;
         possibleAnswers = new ArrayList<>(dictionary.getWords());
         wordsUsed = new ArrayList<>();
         guessedLettersPosition = new boolean[WordleDictionary.WORD_LENGTH];
-        maxHintCount = MAX_HINT_COUNT;
+        hintCount = maxHintCount;
     }
 
     // добавляет слово в список использованных с учетом уникальности
@@ -145,12 +145,12 @@ public class WordleGame {
     // задаем случайной позиции значение true, что означает открытую букву
     private void openNextLetterPosition() {
         // закончились подсказки или все буквы открыты или открыто три и более буквы ничего не делаем
-        if (maxHintCount == 0 || WordleDictionary.isAllTrue(guessedLettersPosition) || WordleDictionary.countTrue(guessedLettersPosition) >= 3) {
+        if (hintCount == 0 || WordleDictionary.isAllTrue(guessedLettersPosition) || WordleDictionary.countTrue(guessedLettersPosition) >= 3) {
             return;
         }
 
         Wordle.gameLogger.log("Используем подсказку, открываем случайную букву");
-        maxHintCount--;
+        hintCount--;
         Random random = new Random();
         while (true) {
             int index = random.nextInt(guessedLettersPosition.length);
@@ -170,7 +170,7 @@ public class WordleGame {
         return dictionary;
     }
 
-    public int getMaxHintCount() {
-        return maxHintCount;
+    public int getHintCount() {
+        return hintCount;
     }
 }
